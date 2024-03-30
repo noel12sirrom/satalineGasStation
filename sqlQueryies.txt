@@ -7,5 +7,5 @@ CREATE TABLE chargecustomer (
 CREATE TABLE representatives (
     customer_id INT, 
     License_plate VARCHAR (20),
-    FOREIGN KEY (customer_id) REFERENCES customers(chargecustomer)
+    FOREIGN KEY (customer_id) REFERENCES chargecustomercustomers(chargecustomer)
 );

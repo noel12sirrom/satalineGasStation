@@ -222,6 +222,11 @@ def addChargeCustomer():
                 cursor.execute("INSERT INTO chargecustomer ( customer_name, number_of_representatives, preference) VALUES (%s, %s, %s)",
                             ( name, numOfRep, pref))
                 db.commit() 
+                # Get the auto-generated customer_id for the newly inserted customer
+                customer_id = cursor.lastrowid
+                for plate in plateNum:
+                    cursor.execute("INSERT INTO representatives (customer_id, License_plate) VALUES (%s, %s)", (customer_id, plate))
+                    db.commit()
                 print("\n\nCustomer added successfully")
             except mysql.connector.Error as err:
                 print(f"Error: {err}")
