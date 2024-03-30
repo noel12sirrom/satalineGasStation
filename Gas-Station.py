@@ -13,16 +13,18 @@ class ChargeCustomer:
     def  __init__(self, id, name, numOfRep, pref, plateNum=[]):
         self.id = id
         self.name = name
-        self.numOfRep = numOfRep
+        self.numOfRep = int(numOfRep)
         self.pref = pref
         self.plateNum = plateNum
     
     def display(self):
-        print(f"ID: {self.id}\nName: {self.name}\nNumber of Representatives: {self.numOfRep}\nPreference: {self.pref}\nLicense Plate Numbers: {self.plateNum}")
+        print(f"\nID: {self.id}\nName: {self.name}\nNumber of Representatives: {self.numOfRep}\nPreference: {self.pref}\nLicense Plate Numbers: {self.plateNum}")
 
-#test variables 
+# variables 
 testChargeCust = ChargeCustomer(1,"gas Pro", 2, None, ["brd232", "ej232"])
 chargeCustomersList = [testChargeCust]
+minDeposit = 10000
+maxLitres = 3785.41
 todaysDate = "01/01/2000"
 itemsPurchased = ['5W-30']       
 
@@ -122,41 +124,42 @@ def serveCustomer(typeOfCustomer):
     
     def CODpayment():
         nonlocal paymentType, change, amount
+        
         while True:
             opt = input("Payment type [(1)Cash/(2)Card]: ")
             if opt == "1":
                 paymentType = "Cash tendered" 
                 if fuelAmt < 2:
                     while True:
-                        opt = input("The minimum purchase is two litres for cash payments. By more gas? (Y/N): ").upper()
+                        opt = input("The minimum purchase is two litres for cash payments. Buy more gas? (Y/N): ").upper()
                         if opt == "Y":
                             takeOrder()
-                            CODpayment()
+                            return CODpayment()  # Terminate and return recursively
                         elif opt ==  "N":
-                            break
-                        
+                            break  # Exit the inner loop
                 amount = float(input("Enter Cash tendered: "))
-                break
-            elif  opt == "2":
+                break  # Exit the outer loop
+            elif opt == "2":
                 paymentType = "Card"
                 amount = total
-                #validate if card amount greater than $1000
+                # Validate if card amount greater than $1000
                 if amount < 1000:
                     while True:
-                        opt = input("The minimum amount is $1000 for card transactions.. Would u like to retake order and add more items? (Y/N): ").upper()
+                        opt = input("The minimum amount is $1000 for card transactions. Would you like to retake the order and add more items? (Y/N): ").upper()
                         if opt == "Y":
                             takeOrder()
-                            CODpayment()
+                            return CODpayment()  # Terminate and return recursively
                         elif opt ==  "N":
-                            break
-                break
-            
-            print( "Please enter a valid option")
+                            break  # Exit the inner loop
+                break  # Exit the outer loop
+            else:
+                print("Please enter a valid option")
         
+        # Check if the amount is less than the total and prompt for additional payment if necessary
         if amount < total:
             difference = total - amount
-            amount = float(input(f"Needs ${difference:.2f} more!\n Enter Cash tendered again: "))
-                    
+            amount = float(input(f"Needs ${difference:.2f} more! Enter Cash tendered again: "))
+        
         change = amount - total
       
     """def chargePayment():"""
@@ -175,37 +178,65 @@ def serveCustomer(typeOfCustomer):
     elif typeOfCustomer == "COD":
         takeOrder() 
         CODpayment() 
-        printReceipt()      
+        printReceipt()
+    
+    mainMenu()      
 
 def addChargeCustomer():
-    customer = ChargeCustomer()
-    
-    if not chargeCustomersList:
-        customer.id = 0
-    else:
-        customer.id = chargeCustomersList[-1].id +1
-    
+    while True:
+        if not chargeCustomersList:
+            id = 0
+        else:
+            id = chargeCustomersList[-1].id +1
         
-    
-    customer.name = input("Enter Customer name: ")
-    customer.numOfRep = input("Enter the number of representatives: ")
-    
-    
-    for i in range(int(customer.numOfRep)):
-        customer.plateNum.apppend(input(f"Enter the license pla number for Represetative {i}: "))
+        name = input("Enter Customer name: ")
+        
+        #validates  that numOfRep is between 1 and  5 inclusive
+        while True:
+            num = int(input("Enter the number of representatives: "))
+            if num > 0 and num <= 5:
+                numOfRep = num 
+                break
+            print("Cannot enter more than 5 representatives or less than one")
+        
+        #validates if all license plat numbrs given are unique
+        plateNum = []
+        for i in range(numOfRep):
+            while True:
+                plate = input(f"Enter the license plate number for Represetative {i+1}: ")
+                if plate not in plateNum:
+                    plateNum.append(plate)
+                    break 
+                print("Plate number already entered!") 
+                
+        #preference is randomly generated
+        pref = random.choice(["Deposit", "Maximum Litres"])
+        
+        customer = ChargeCustomer(id, name, numOfRep, pref, plateNum)
+        
+        customer.display()
+        
+        opt = input("\n\nSave [1]\nRemake [2]\nClick any other character to omit: ")
+        if opt == "1":
+            chargeCustomersList.append(customer)
+            print(chargeCustomersList)
+            break
+        elif opt == "2":
+            continue
+    mainMenu()
     
 
-    opt = random.randint(0,1)
 
-while True:   
-    opt = input("\nServe Customer: 1\nAdd Charge Customer: 2\nUpdate Charge Customer: 3\nDelete Charge Customer: 4\nMake payment to charge account: 5\nRefuel tank: 6\nGenerate report: 7\nEXIT PROGRAM: 8\n  Selection: ")
+def mainMenu():   
+    opt = input("\nServe Customer: 1\nAdd Charge Customer: 2\nUpdate Charge Customer: 3\nDelete Charge Customer: 4\nMake payment to charge account: 5\nRefuel tank: 6\nGenerate report: 7\nEXIT PROGRAM: 'ANY OTHER CHARACTER'\n  Selection: ")
     if opt == '1':
         opt = input("Customer Type [(1) COD,(2)Charge ]: ")
         if opt == '1':
             serveCustomer("COD")
         elif opt == '2':
             serveCustomer("charge")
+    if opt == "2":
+        addChargeCustomer()
                  
-    elif opt == '8':
-        break
- 
+        
+mainMenu()
