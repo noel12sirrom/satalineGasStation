@@ -218,14 +218,37 @@ def addChargeCustomer():
         
         opt = input("\n\nSave [1]\nRemake [2]\nClick any other character to omit: ")
         if opt == "1":
-            chargeCustomersList.append(customer)
-            print(chargeCustomersList)
+            try:
+                cursor.execute("INSERT INTO chargecustomer ( customer_name, number_of_representatives, preference) VALUES (%s, %s, %s)",
+                            ( name, numOfRep, pref))
+                db.commit() 
+                print("\n\nCustomer added successfully")
+            except mysql.connector.Error as err:
+                print(f"Error: {err}")
+                db.rollback()
             break
         elif opt == "2":
             continue
     mainMenu()
-    
 
+def deleteChargeCustomer():
+    password = "admin"
+    givenPassword = input("Enter password: ")
+    if givenPassword != password:
+        print("incorrect Passowrd")
+        mainMenu()
+    
+    givenId = input("Enter Customer ID Number: ")
+    
+    try:
+        cursor.execute("DELETE from chargecustomer WHERE customer_id=%s", (givenId,))
+        db.commit()  
+        print("\nRecord deleted successfully")
+    except mysql.connector.Error as err:
+        print(f"\nError: {err}")
+        db.rollback()
+         
+    mainMenu()
 
 def mainMenu():   
     opt = input("\nServe Customer: 1\nAdd Charge Customer: 2\nUpdate Charge Customer: 3\nDelete Charge Customer: 4\nMake payment to charge account: 5\nRefuel tank: 6\nGenerate report: 7\nEXIT PROGRAM: 'ANY OTHER CHARACTER'\n  Selection: ")
@@ -237,6 +260,8 @@ def mainMenu():
             serveCustomer("charge")
     if opt == "2":
         addChargeCustomer()
+    if opt =="4":
+        deleteChargeCustomer()
                  
         
 mainMenu()

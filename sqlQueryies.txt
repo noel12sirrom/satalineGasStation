@@ -1,6 +1,6 @@
 CREATE TABLE chargecustomer (
     customer_id INT PRIMARY KEY AUTO_INCREMENT,
-    cutomer_name VARCHAR(100),
+    customer_name VARCHAR(100),
     number_of_representatives INT,
     preference VARCHAR(20)
   );
