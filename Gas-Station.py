@@ -1,4 +1,14 @@
 import random
+import mysql.connector
+
+db = mysql.connector.connect(
+    host = "localhost",
+    user = "root",
+    passwd =  "GasStation",
+    database = "GasStation"
+)
+cursor = db.cursor()
+
 class ChargeCustomer:
     def  __init__(self, id, name, numOfRep, pref, plateNum=[]):
         self.id = id
@@ -9,6 +19,7 @@ class ChargeCustomer:
     
     def display(self):
         print(f"ID: {self.id}\nName: {self.name}\nNumber of Representatives: {self.numOfRep}\nPreference: {self.pref}\nLicense Plate Numbers: {self.plateNum}")
+
 #test variables 
 testChargeCust = ChargeCustomer(1,"gas Pro", 2, None, ["brd232", "ej232"])
 chargeCustomersList = [testChargeCust]
@@ -39,7 +50,6 @@ inventory = {'87':{"maxCapacity":75708.23,
                       "price":2100.00}
             }
 
-
 def serveCustomer(typeOfCustomer):
     currentCustomer = None
     change = 0
@@ -49,7 +59,9 @@ def serveCustomer(typeOfCustomer):
     fuelAmt = 0
     itemsPurchased = {}
     paymentType =""
-        
+    
+    
+    #validates if the Charge customer exists in the system and if the proper liscence plates are presented
     def validate():
         givenId = int(input("\nEnter ID: "))
         for customer in chargeCustomersList:
@@ -74,10 +86,17 @@ def serveCustomer(typeOfCustomer):
             elif opt  == 'N':
                 return False
             print("Invalid Entry. Please Enter Y or N.")  
-        
+    
+    #takes the order of lubricants and fuel and calculates the total with gct
     def takeOrder():
         nonlocal total, fuelAmt, tax
-        fuelType =(input("\nFuel Type: ").upper())
+        
+        fuelType = input("\nFuel Type: ").upper()
+        
+        while fuelType not in inventory:
+            print("Invalid entry.")
+            fuelType = input("\nFuel Type: ").upper()
+            
         fuelAmt = int(input("Enter fuel amount (litres): "))
         itemsPurchased[fuelType] = fuelAmt #adds it itemsPurchased Dictionary
         
@@ -139,6 +158,9 @@ def serveCustomer(typeOfCustomer):
             amount = float(input(f"Needs ${difference:.2f} more!\n Enter Cash tendered again: "))
                     
         change = amount - total
+      
+    """def chargePayment():"""
+      #get this dine after add customer  
         
     def printReceipt():
         print(f"\n\n{todaysDate}\nType of Customer: {typeOfCustomer}\n----")
@@ -162,10 +184,12 @@ def addChargeCustomer():
         customer.id = 0
     else:
         customer.id = chargeCustomersList[-1].id +1
+    
         
     
     customer.name = input("Enter Customer name: ")
     customer.numOfRep = input("Enter the number of representatives: ")
+    
     
     for i in range(int(customer.numOfRep)):
         customer.plateNum.apppend(input(f"Enter the license pla number for Represetative {i}: "))
@@ -185,7 +209,3 @@ while True:
     elif opt == '8':
         break
  
-
-    
-    
-
