@@ -65,28 +65,17 @@ def serveCustomer(typeOfCustomer):
     
     #validates if the Charge customer exists in the system and if the proper liscence plates are presented
     def validate():
-        nonlocal preference
         givenId = int(input("\nEnter ID: "))
-        try:
-            cursor.execute("SELECT customer_id FROM chargecustomer")
-            results = cursor.fetchall()
-            for x in results:
-                if x[0] == givenId:  # Access the first column of the result row
-                    cursor.execute(f"SELECT * FROM chargecustomer WHERE customer_id = {givenId}")
-                    result = cursor.fetchall()
-                    #prints out all information about that user
-                    for row in result:
-                        print(row)
-                    cursor.execute(f"SELECT preference FROM chargecustomer WHERE customer_id = {givenId}")
-                    result = cursor.fetchone()
-                    preference = result[0]
-                    print(preference)    
-                    break
-        except mysql.connector.Error as err:
-            print(f"Error: {err}")
-            db.rollback() # isnt needed but can stay in case of soem wild unrelated error
+        for customer in chargeCustomersList:
+            if customer.id == givenId:
+                nonlocal currentCustomer
+                currentCustomer  = customer
+                break
+        else:
+            print("Charge Account Not found.")
             return False
-             
+            
+        print(customer.name) 
     
         #print out license plate under the under the ID
         print("See List below for plates eligible for fuel")
