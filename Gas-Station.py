@@ -72,15 +72,13 @@ def serveCustomer(typeOfCustomer):
             results = cursor.fetchall()
             for x in results:
                 if x[0] == givenId:  # Access the first column of the result row
-                    cursor.execute(f"SELECT * FROM chargecustomer WHERE customer_id = {givenId}")
-                    result = cursor.fetchall()
-                    #prints out all information about that user
-                    for row in result:
-                        print(row)
+                    cursor.execute(f"SELECT customer_name FROM chargecustomer WHERE customer_id = {givenId}")
+                    result = cursor.fetchone()
+                    print(result[0])
+                       
                     cursor.execute(f"SELECT preference FROM chargecustomer WHERE customer_id = {givenId}")
                     result = cursor.fetchone()
-                    preference = result[0]
-                    print(preference)    
+                    preference = result[0]    
                     break
         except mysql.connector.Error as err:
             print(f"Error: {err}")
@@ -90,8 +88,10 @@ def serveCustomer(typeOfCustomer):
     
         #print out license plate under the under the ID
         print("See List below for plates eligible for fuel")
-        for index, plate in enumerate(currentCustomer.plateNum, start=1):
-            print(f"{index}. {plate}")
+        cursor.execute(f"SELECT License_plate FROM representatives WHERE customer_id = {givenId}")
+        result = cursor.fetchall()
+        for row in result:
+            print(row)
         while True:
             opt = input("Eligible Plates (Y/N): ").upper()
             if opt == 'Y' :
@@ -102,7 +102,7 @@ def serveCustomer(typeOfCustomer):
     
     #takes the order of lubricants and fuel and calculates the total with gct
     def takeOrder():
-        nonlocal total, fuelAmt, tax
+        nonlocal total, fuelAmt, tax, preference
         
         fuelType = input("\nFuel Type: ").upper()
         
@@ -266,10 +266,14 @@ def deleteChargeCustomer():
          
     mainMenu()
 
+def updateInventory():
+    print("\nfeature hasnt been added")
+    mainMenu()
+
 def mainMenu():   
-    opt = input("\nServe Customer: 1\nAdd Charge Customer: 2\nUpdate Charge Customer: 3\nDelete Charge Customer: 4\nMake payment to charge account: 5\nRefuel tank: 6\nGenerate report: 7\nEXIT PROGRAM: 'ANY OTHER CHARACTER'\n  Selection: ")
+    opt = input("\nServe Customer: 1\nAdd Charge Customer: 2\nUpdate Charge Customer: 3\nDelete Charge Customer: 4\nMake payment to charge account: 5\nRefuel tank: 6\nGenerate report: 7\nUpdate inventory: 8\nEXIT PROGRAM: 'ANY OTHER CHARACTER'\n  Selection: ")
     if opt == '1':
-        opt = input("Customer Type [(1) COD,(2)Charge ]: ")
+        opt = input("Customer Type [COD (1) ,Charge (2)]: ")
         if opt == '1':
             serveCustomer("COD")
         elif opt == '2':
